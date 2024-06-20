@@ -13,6 +13,41 @@ def oeffneAuftragsErstellung():
     FensterAuftragserstellung = tkinter.Toplevel(main)
     FensterAuftragserstellung.title("Auftrag erstellen")
 
+    def erstelleAuftrag():
+        """
+         Eingabe: Werte, die in die Entry-Widgets eingegeben wurden
+         Verarbeitung: Mit diesen Werten wird die Tabelle "Fertigungsaufträge" befüllt
+         Ausgabe: Meldung, falls ein Feld nicht ausgefüllt wurde, ansonsten "Auftrag erstellt"
+        """
+        try:
+            ProduktID = int(etProduktID.get())
+            Menge = int(etMenge.get())
+            Anfangsdatum = str(etAnfangdatum.get())
+            Enddatum = etEnddatum.get()
+            lbAusgabe["text"] = "Auftrag erstellt"
+
+        except:
+            lbAusgabe["text"] = "Bitte alle Felder ausfüllen"
+        
+        finally:
+            if len(Anfangsdatum) == 0 or len(Enddatum) == 0:
+                 lbAusgabe["text"] = "Bitte alle Felder ausfüllen"
+                 erstelleAuftrag()
+
+        etProduktID.delete(0, 'end')
+        etMenge.delete(0, 'end')
+        etAnfangdatum.delete(0, 'end')
+        etEnddatum.delete(0, 'end')
+        connection = sqlite3.connect("firma.db")
+        cursor = connection.cursor()
+        cursor = connection.cursor()
+        sql_script = f"""
+        Insert into Fertigungsaufträge(ProduktID, Menge, Auftragsbeginn, Auftragsende)
+        Values ({ProduktID}, {Menge}, '{Anfangsdatum}', '{Enddatum}')"""
+        
+        cursor.execute(sql_script)
+        connection.commit()
+
     lbProdukt = tkinter.Label(FensterAuftragserstellung, text="Produkt-ID:")
     lbProdukt.grid(row=0, column=0, sticky="w", padx=5, pady=5)
     etProduktID = tkinter.Entry(FensterAuftragserstellung)
@@ -36,7 +71,7 @@ def oeffneAuftragsErstellung():
     lbAusgabe = tkinter.Label(FensterAuftragserstellung, text="Auftrag-Erstellen")
     lbAusgabe.grid(row=4, column=0, padx=5, pady=5)
     
-    buAuftragErstellen = tkinter.Button(FensterAuftragserstellung, text ="Erstelle Auftrag")
+    buAuftragErstellen = tkinter.Button(FensterAuftragserstellung, text ="Erstelle Auftrag", command=erstelleAuftrag)
     buAuftragErstellen.grid(row=4, column=1, padx=5, pady=5)
 
 buFenster = ttk.Button(main, text="Auftrag erstellen", command=oeffneAuftragsErstellung)
