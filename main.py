@@ -119,8 +119,6 @@ def oeffneTabellenbfrage():
 
         anzahl_spalten = 0
 
-        connection = sqlite3.connect("firma.db")
-        cursor = connection.cursor()
         sql = f"""
         select count(*) from pragma_table_info('{tabelle}');
         """
@@ -153,8 +151,6 @@ def oeffneTabellenbfrage():
         # Headings  
         # respective columns
 
-        connection = sqlite3.connect("firma.db")
-        cursor = connection.cursor()
         sql = f"""
         pragma table_info('{tabelle}');
         """
