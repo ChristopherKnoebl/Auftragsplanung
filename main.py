@@ -2,6 +2,71 @@ import tkinter
 import sqlite3
 from tkinter import ttk
 
+def ermittele_auftragsbedarf(Produkt_Id, Auftragsmenge):
+
+    connection = sqlite3.connect("firma.db")
+    cursor = connection.cursor()
+    sql = f"""
+    Select Materialien.ID, Produkt_Material_Verbund.Menge 
+    FROM Produkt_Material_Verbund
+    INNER JOIN Produkte on Produkt_Material_Verbund.ProduktID = Produkte.ID 
+    Inner JOIN Materialien on Produkt_Material_Verbund.MaterialID = Materialien.ID
+    WHERE Produkte.ID ={Produkt_Id}
+    """
+    cursor.execute(sql)
+    material_dictionary = {}
+    for i in cursor:
+        material_dictionary[i[0]] = i[1] * Auftragsmenge # gibt an, wie viel von den einzelnen Materialien benötigt wird
+
+    connection.commit()
+
+    connection = sqlite3.connect("firma.db")
+    cursor = connection.cursor()
+    sql = f"""
+    Select Produkte.Bezeichnung, Materialien.Bezeichnung, Produkt_Material_Verbund.Menge 
+    FROM Produkt_Material_Verbund
+    INNER JOIN Produkte on Produkt_Material_Verbund.ProduktID = Produkte.ID 
+    Inner JOIN Materialien on Produkt_Material_Verbund.MaterialID = Materialien.ID
+    WHERE Produkte.ID ={Produkt_Id}
+    """
+    cursor.execute(sql)
+    bestands_liste = {}
+
+    return material_dictionary
+
+def ermittle_lagerbestand(dictionary_auftragsbedarf):
+    #FUnktion bekommt Dictionary übergeben, soll für die jeweiligen Key den zugehörigen Gesamtbestand ermitteln
+
+    lagerbestand = {}
+
+
+    for k in dictionary_auftragsbedarf.keys():
+        connection = sqlite3.connect("firma.db")
+        cursor = connection.cursor()
+        sql = f"""
+        select Lagerbestand.MaterialID,
+        sum(Lagerbestand.Menge)
+        FROM Lager
+        inner Join Lagerbestand on Lagerbestand.LagerID = Lager.ID
+        where Lagerbestand.MaterialID = {k}
+        """
+        cursor.execute(sql)
+        for i in cursor:
+            lagerbestand[i[0]] = i[1]
+    
+    return lagerbestand
+
+def vergleiche_bedarf_bestand(dictionary_auftragsbedarf, dictionary_lagerbestand):
+    materialmangel = False # Hilfsvariable, die false ist, solange kein Matrialmangel vorliegt
+    for k in dictionary_auftragsbedarf.keys():
+        if dictionary_auftragsbedarf[k] > dictionary_lagerbestand[k]:
+            materialmangel = True
+    
+    if materialmangel == False:
+        return True
+    else:
+        return False
+
 # öffne das Hauptfenster
 main = tkinter.Tk()
 navigations_frame = tkinter.Frame(main)
@@ -35,7 +100,6 @@ def oeffne_auftragserstellung():
          Ausgabe: Meldung, falls ein Feld nicht ausgefüllt wurde, ansonsten "Auftrag erstellt"
         """
 
-
         try:
             ProduktID = int(etProduktID.get())
             Menge = int(etMenge.get())
@@ -63,6 +127,16 @@ def oeffne_auftragserstellung():
         cursor.execute(sql_script)
         connection.commit()
 
+        auftragsbedarf = ermittele_auftragsbedarf(ProduktID, Menge)
+        lagerbestand = ermittle_lagerbestand(auftragsbedarf)
+
+        if vergleiche_bedarf_bestand(auftragsbedarf, lagerbestand) == True:
+            lbAuftragMöglich["text"] = "Der Auftrag kann erstellt werden"
+        else:
+            lbAuftragMöglich["text"] = "Für den Auftrag fehlt noch Material"
+        
+        
+
     lbProdukt = tkinter.Label(eingabe_frame, text="Produkt-ID:")
     lbProdukt.grid(row=0, column=0, sticky="w", padx=5, pady=5)
     etProduktID = tkinter.Entry(eingabe_frame)
@@ -88,6 +162,9 @@ def oeffne_auftragserstellung():
 
     buAuftragErstellen = tkinter.Button(eingabe_frame, text="Erstelle Auftrag", command=erstelle_auftrag)
     buAuftragErstellen.grid(row=4, column=1, padx=5, pady=5)
+
+    lbAuftragMöglich = tkinter.Label(eingabe_frame, text="Prüfe, ob Auftrag erstellt werden kann.")
+    lbAuftragMöglich.grid(row=4, column=2, padx=5, pady=5)
 
 buFenster = ttk.Button(main, text="Auftrag erstellen", command=oeffne_auftragserstellung)
 buFenster.grid(row=0, column=0, padx=5, pady=5)
