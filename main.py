@@ -2,7 +2,17 @@ import tkinter
 import sqlite3
 from tkinter import ttk
 
-def ermittele_auftragsbedarf(Produkt_Id, Auftragsmenge):
+def execute_query(connection, sql, params=()):
+    """
+    Funktion für die Datenbankanbindung
+    """
+    with connection:
+        cursor = connection.cursor()
+        cursor.execute(sql, params)
+        return cursor.fetchall()
+
+
+def ermittele_auftragsbedarf(connection, Produkt_Id, Auftragsmenge):
 
     connection = sqlite3.connect("firma.db")
     cursor = connection.cursor()
@@ -11,61 +21,37 @@ def ermittele_auftragsbedarf(Produkt_Id, Auftragsmenge):
     FROM Produkt_Material_Verbund
     INNER JOIN Produkte on Produkt_Material_Verbund.ProduktID = Produkte.ID 
     Inner JOIN Materialien on Produkt_Material_Verbund.MaterialID = Materialien.ID
-    WHERE Produkte.ID ={Produkt_Id}
+    WHERE Produkte.ID =?
     """
-    cursor.execute(sql)
-    material_dictionary = {}
-    for i in cursor:
-        material_dictionary[i[0]] = i[1] * Auftragsmenge # gibt an, wie viel von den einzelnen Materialien benötigt wird
-
-    connection.commit()
-
-    connection = sqlite3.connect("firma.db")
-    cursor = connection.cursor()
-    sql = f"""
-    Select Produkte.Bezeichnung, Materialien.Bezeichnung, Produkt_Material_Verbund.Menge 
-    FROM Produkt_Material_Verbund
-    INNER JOIN Produkte on Produkt_Material_Verbund.ProduktID = Produkte.ID 
-    Inner JOIN Materialien on Produkt_Material_Verbund.MaterialID = Materialien.ID
-    WHERE Produkte.ID ={Produkt_Id}
-    """
-    cursor.execute(sql)
-    bestands_liste = {}
-
+    rows = execute_query(connection, sql, (Produkt_Id,))
+    material_dictionary = {row[0]: row[1] * Auftragsmenge for row in rows}
     return material_dictionary
 
-def ermittle_lagerbestand(dictionary_auftragsbedarf):
-    #FUnktion bekommt Dictionary übergeben, soll für die jeweiligen Key den zugehörigen Gesamtbestand ermitteln
 
+  
+
+def ermittle_lagerbestand(connection, dictionary_auftragsbedarf):
+    """
+    Funktion, mit der der Lagerbestand für einen gegebenen Auftrag berechnet wird
+    """
     lagerbestand = {}
-
-
     for k in dictionary_auftragsbedarf.keys():
-        connection = sqlite3.connect("firma.db")
-        cursor = connection.cursor()
-        sql = f"""
-        select Lagerbestand.MaterialID,
-        sum(Lagerbestand.Menge)
+        sql = """
+        SELECT Lagerbestand.MaterialID, SUM(Lagerbestand.Menge)
         FROM Lager
-        inner Join Lagerbestand on Lagerbestand.LagerID = Lager.ID
-        where Lagerbestand.MaterialID = {k}
+        INNER JOIN Lagerbestand ON Lagerbestand.LagerID = Lager.ID
+        WHERE Lagerbestand.MaterialID = ?
         """
-        cursor.execute(sql)
-        for i in cursor:
-            lagerbestand[i[0]] = i[1]
-    
+        rows = execute_query(connection, sql, (k,))
+        for row in rows:
+            lagerbestand[row[0]] = row[1]
     return lagerbestand
 
 def vergleiche_bedarf_bestand(dictionary_auftragsbedarf, dictionary_lagerbestand):
-    materialmangel = False # Hilfsvariable, die false ist, solange kein Matrialmangel vorliegt
     for k in dictionary_auftragsbedarf.keys():
-        if dictionary_auftragsbedarf[k] > dictionary_lagerbestand[k]:
-            materialmangel = True
-    
-    if materialmangel == False:
-        return True
-    else:
-        return False
+        if dictionary_auftragsbedarf[k] > dictionary_lagerbestand.get(k, 0):
+            return False
+    return True
 
 # öffne das Hauptfenster
 main = tkinter.Tk()
@@ -118,17 +104,15 @@ def oeffne_auftragserstellung():
         etAnfangdatum.delete(0, 'end')
         etEnddatum.delete(0, 'end')
         connection = sqlite3.connect("firma.db")
-        cursor = connection.cursor()
-        cursor = connection.cursor()
-        sql_script = f"""
-        Insert into Fertigungsaufträge(ProduktID, Menge, Auftragsbeginn, Auftragsende)
-        Values ({ProduktID}, {Menge}, '{Anfangsdatum}', '{Enddatum}')"""
-
-        cursor.execute(sql_script)
+        sql_script = """
+            INSERT INTO Fertigungsaufträge (ProduktID, Menge, Auftragsbeginn, Auftragsende)
+            VALUES (?, ?, ?, ?)
+            """
+        execute_query(connection, sql_script, (ProduktID, Menge, Anfangsdatum, Enddatum))
         connection.commit()
 
-        auftragsbedarf = ermittele_auftragsbedarf(ProduktID, Menge)
-        lagerbestand = ermittle_lagerbestand(auftragsbedarf)
+        auftragsbedarf = ermittele_auftragsbedarf(connection, ProduktID, Menge)
+        lagerbestand = ermittle_lagerbestand(connection, auftragsbedarf)
 
         if vergleiche_bedarf_bestand(auftragsbedarf, lagerbestand) == True:
             lbAuftragMöglich["text"] = "Der Auftrag kann erstellt werden"
@@ -184,9 +168,19 @@ def oeffneTabellenbfrage():
 
         try:
             tabelle = str(etEingabe.get())
-            lbTabelle["text"] = tabelle
+
+            # Define a whitelist of allowed table names
+            allowed_tables = ["Produkte", "Materialien", "Fertigungsaufträge", "Lagerbestand", "Lager"]
+
+            if tabelle not in allowed_tables:
+                lbTabelle["text"] = "Ungültige Tabelle ausgewählt"
+                return
+
+            # Proceed with the query now that `tabelle` is validated
+            sql = f"SELECT * FROM {tabelle}"  # Safe since `tabelle` is validated against the whitelist
+            cursor.execute(sql)
         except:
-            lbTabelle["text"] = "Nichts ausgewählt"
+            lbTabelle["text"] = f"{tabelle}"
 
 
         connection = sqlite3.connect("firma.db")
