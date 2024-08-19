@@ -1,6 +1,7 @@
 import tkinter
 import sqlite3
 from tkinter import ttk
+import datetime
 
 def execute_query(connection, sql, params=()):
     """
@@ -89,26 +90,32 @@ def oeffne_auftragserstellung():
         try:
             ProduktID = int(etProduktID.get())
             Menge = int(etMenge.get())
-            Anfangsdatum = str(etAnfangdatum.get())
-            Enddatum = etEnddatum.get()
+            Anfangsdatum = datetime.date(int(etJahr_Beginn.get()), int(etMonat_Beginn.get()), int(etTag_Beginn.get()))
+            Anfangsdatum_ISO = Anfangsdatum.isoformat()
+            Enddatum = datetime.date(int(etJahr_Ende.get()), int(etMonat_Ende.get()), int(etTag_Ende.get()))
+            Enddatum_ISO = Enddatum.isoformat()
             lbAusgabe["text"] = "Auftrag erstellt"
         except:
             lbAusgabe["text"] = "Bitte alle Felder ausfüllen"
         finally:
-            if len(Anfangsdatum) == 0 or len(Enddatum) == 0:
-                lbAusgabe["text"] = "Bitte alle Felder ausfüllen"
+            if Anfangsdatum < datetime.date.today():
+                lbAusgabe["text"] = "Der Auftragsbeginn darf nicht in der Vergangenheit liegen"
                 erstelle_auftrag()
 
         etProduktID.delete(0, 'end')
         etMenge.delete(0, 'end')
-        etAnfangdatum.delete(0, 'end')
-        etEnddatum.delete(0, 'end')
+        etJahr_Beginn.delete(0, 'end')
+        etMonat_Beginn.delete(0, 'end')
+        etTag_Beginn.delete(0, 'end')
+        etJahr_Ende.delete(0, 'end')
+        etMonat_Ende.delete(0, 'end')
+        etTag_Ende.delete(0, 'end')
         connection = sqlite3.connect("firma.db")
         sql_script = """
             INSERT INTO Fertigungsaufträge (ProduktID, Menge, Auftragsbeginn, Auftragsende)
             VALUES (?, ?, ?, ?)
             """
-        execute_query(connection, sql_script, (ProduktID, Menge, Anfangsdatum, Enddatum))
+        execute_query(connection, sql_script, (ProduktID, Menge, Anfangsdatum_ISO, Enddatum_ISO))
         connection.commit()
 
         auftragsbedarf = ermittele_auftragsbedarf(connection, ProduktID, Menge)
@@ -132,26 +139,53 @@ def oeffne_auftragserstellung():
     etMenge.grid(row=1, column=1, padx=5, pady=5)
 
     lbAnfangdatum = tkinter.Label(eingabe_frame, text="Auftragsbeginn:")
-    lbAnfangdatum.grid(row=2, column=0, sticky="w", padx=5, pady=5)
-    etAnfangdatum = tkinter.Entry(eingabe_frame)
-    etAnfangdatum.grid(row=2, column=1, padx=5, pady=5)
+    lbAnfangdatum.grid(row=2, column=0, sticky="w")
+
+    lbTag_Beginn = tkinter.Label(eingabe_frame, text= "Tag: ")
+    lbTag_Beginn.grid(row=3, column=0, sticky="w")
+    etTag_Beginn = tkinter.Entry(eingabe_frame)
+    etTag_Beginn.grid(row=3, column=1)
+
+    lbMonat_Beginn = tkinter.Label(eingabe_frame, text= "Monat: ")
+    lbMonat_Beginn.grid(row=3, column=2)
+    etMonat_Beginn = tkinter.Entry(eingabe_frame)
+    etMonat_Beginn.grid(row=3, column=3)
+
+    lbJahr_Beginn = tkinter.Label(eingabe_frame, text= "Jahr: ")
+    lbJahr_Beginn.grid(row=3, column=4)
+    etJahr_Beginn = tkinter.Entry(eingabe_frame)
+    etJahr_Beginn.grid(row=3, column=5)
 
     lbEnddatum = tkinter.Label(eingabe_frame, text="Auftragsende")
-    lbEnddatum.grid(row=3, column=0, sticky="w", padx=5, pady=5)
-    etEnddatum = tkinter.Entry(eingabe_frame)
-    etEnddatum.grid(row=3, column=1, padx=5, pady=5)
+    lbEnddatum.grid(row=4, column=0, sticky="w")
+
+    lbTag_Ende = tkinter.Label(eingabe_frame, text= "Tag: ")
+    lbTag_Ende.grid(row=5, column=0, sticky="w", padx=5, pady=5)
+    etTag_Ende = tkinter.Entry(eingabe_frame)
+    etTag_Ende.grid(row=5, column=1)
+
+    lbMonat_Ende = tkinter.Label(eingabe_frame, text= "Monat: ")
+    lbMonat_Ende.grid(row=5, column=2)
+    etMonat_Ende = tkinter.Entry(eingabe_frame)
+    etMonat_Ende.grid(row=5, column=3)
+
+    lbJahr_Ende = tkinter.Label(eingabe_frame, text= "Jahr: ")
+    lbJahr_Ende.grid(row=5, column=4)
+    etJahr_Ende = tkinter.Entry(eingabe_frame)
+    etJahr_Ende.grid(row=5, column=5)
 
     lbAusgabe = tkinter.Label(ausgabe_frame, text="Auftrag-Erstellen")
-    lbAusgabe.grid(row=4, column=0, padx=5, pady=5)
+    lbAusgabe.grid(row=6, column=0, padx=5, pady=5)
 
     buAuftragErstellen = tkinter.Button(eingabe_frame, text="Erstelle Auftrag", command=erstelle_auftrag)
-    buAuftragErstellen.grid(row=4, column=1, padx=5, pady=5)
+    buAuftragErstellen.grid(row=6, column=0, padx=5, pady=5)
 
     lbAuftragMöglich = tkinter.Label(eingabe_frame, text="Prüfe, ob Auftrag erstellt werden kann.")
-    lbAuftragMöglich.grid(row=4, column=2, padx=5, pady=5)
+    lbAuftragMöglich.grid(row=6, column=1, padx=5, pady=5)
 
 buFenster = ttk.Button(main, text="Auftrag erstellen", command=oeffne_auftragserstellung)
 buFenster.grid(row=0, column=0, padx=5, pady=5)
+
 
 
 # öffnet ein neues Fenster, in dem die verschiedenen Tabellen abgefragt werden können
@@ -169,15 +203,15 @@ def oeffneTabellenbfrage():
         try:
             tabelle = str(etEingabe.get())
 
-            # Define a whitelist of allowed table names
+            # Erstelle Whitelist für erlaubte Tabellen
             allowed_tables = ["Produkte", "Materialien", "Fertigungsaufträge", "Lagerbestand", "Lager"]
 
             if tabelle not in allowed_tables:
                 lbTabelle["text"] = "Ungültige Tabelle ausgewählt"
                 return
 
-            # Proceed with the query now that `tabelle` is validated
-            sql = f"SELECT * FROM {tabelle}"  # Safe since `tabelle` is validated against the whitelist
+            # Fahre fort, wenn die Tabelle in der Whitelist ist
+            sql = f"SELECT * FROM {tabelle}"
             cursor.execute(sql)
         except:
             lbTabelle["text"] = f"{tabelle}"
@@ -272,6 +306,6 @@ def oeffneTabellenbfrage():
 
 
 buFenster = ttk.Button(main, text="Tabelle abfragen", command=oeffneTabellenbfrage)
-buFenster.grid(row=0, column=1, padx=5, pady=5)
+buFenster.grid(row=0, column=2, padx=5, pady=5)
 
 tkinter.mainloop()
