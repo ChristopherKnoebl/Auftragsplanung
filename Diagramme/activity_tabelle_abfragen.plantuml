@@ -1,0 +1,18 @@
+@startuml Tabellenabfrage
+mainframe ac Tabellenabfrage
+
+start
+
+: Wähle Tabelle aus;
+if (Fertigungsaufträge abfragen) then (JA)
+    : Frage Fertigungsaufträge ab;
+    : Erstelle Materialbedarf;
+    : Gib DB und Materialbedarf wieder;
+else (NEIN)
+: Greife auf DB zu;
+: Übermittle DB-Ergebnisse;
+endif
+
+stop
+
+@enduml

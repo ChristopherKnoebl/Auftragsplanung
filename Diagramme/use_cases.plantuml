@@ -1,0 +1,27 @@
+@startuml Use Cases
+
+mainframe ud Auftragsplanung
+
+left to right direction
+actor "Mitarbeiter" as MA
+actor "Disponent" as DSP
+actor "Steuerer" as ST
+rectangle Fertigungsplanung {
+    usecase "Lager abfragen" as lager
+    usecase "Aufträge abfragen" as auftraege_abfragen
+    usecase "Material disponieren" as material
+    usecase "Auftrag erstellen" as auftraege_erstellen
+    usecase "Lagerbestand prüfen" as lagerbestand
+}
+
+
+MA <|-- DSP
+MA <|-- ST
+MA --> lager
+MA --> auftraege_abfragen
+DSP --> material
+ST --> auftraege_erstellen
+(auftraege_erstellen) <|-- (lagerbestand)
+
+
+@enduml

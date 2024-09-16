@@ -1,0 +1,22 @@
+@startuml Auftrag erstellen
+mainframe ac Fertigungsauftrag erstellen
+
+start
+
+: Eingabe Auftragsdaten;
+: Greife auf DB zu;
+: Ermittle Materialbedarf;
+if (Lagerbestand ausreichend) then (JA)
+else (NEIN)
+    :Gib Warnhinweis;
+    if (Soll Auftrag trotzdem erstellt werden?) then (NEIN)
+        stop
+    endif
+    
+
+endif
+: Lies Fertigungsauftrag in Auftragstabelle ein;
+stop
+
+
+@enduml

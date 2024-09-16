@@ -1,0 +1,16 @@
+@startuml Materialdisposition
+mainframe ac Materialdisposition
+
+start 
+: Greife aus Lager in SQL zu;
+: Gib CRUD-Operation aus;
+if (Operation ist erlaubt) (YES)
+    : Führe Operation aus;
+else (NEIN)
+    : Gib Fehlermeldung;
+endif
+: Gib Rückmeldung;
+
+stop
+
+@enduml

@@ -1,0 +1,53 @@
+@startuml Klassendiagramm
+
+mainframe cd Auftragsmanagement
+
+skinparam classAttributeIconSize 0
+class Fertigungsaufträge {
++Auftragsnummer 
++Produktname
++Menge
++Auftragsbeginn
++Auftragsende
+-timestamp
++kalkuliere_Materialbedarf()
++erstelle_Stückliste()
++deckt_Lagerbestand_Materialbedarf()
+}
+
+class Hauptfenster {
++Button_Fenter_schließen
+-Button_Bestandsabfrage
+-Button_Auftragsabfrage
+-Button_Bestandsdisposition
+-Button_Auftragserstellung
++schließe_Fenster()
+-oeffne_Bestandsabfrage()
+-oeffne_Auftragsabfrage()
+-oeffne_Bestandsdisposition()
+-oeffne_Auftragserstellung()
+}
+class Bestandsabfrage {
+-Button_Bestand_abfragen
+-frage_Bestand_ab() 
+}
+class Bestandsdisposition {
+-Button_Bestand_disponieren
+-Button_Bestand_abfragen
+-frage_Bestand_ab() 
+-disponiere_Bestand() 
+}
+
+class Auftragsabfrage {
+-Button_Auftrag_abfragen
+-frage_Auftrag_ab()
+}
+class Auftragserstellung {
+-Button_Auftrag_erstellen
+-Button_Auftrag_abfragen
+-erstelle_Auftrag()
+-frage_Auftrag_ab()
+}
+
+hide circle
+@enduml
