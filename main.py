@@ -110,16 +110,16 @@ class Hauptfenster:
 
         # Buttons im Hauptfenster
         self.button_bestandsabfrage = tk.Button(root, text="Bestandsabfrage", command=self.oeffne_bestandsabfrage)
-        self.button_bestandsabfrage.pack()
+        self.button_bestandsabfrage.pack(side="left")
 
         self.button_auftragsabfrage = tk.Button(root, text="Auftragsabfrage", command=self.oeffne_auftragsabfrage)
-        self.button_auftragsabfrage.pack()
+        self.button_auftragsabfrage.pack(side="left")
 
         self.button_bestandsdisposition = tk.Button(root, text="Bestandsdisposition", command=self.oeffne_bestandsdisposition)
-        self.button_bestandsdisposition.pack()
+        self.button_bestandsdisposition.pack(side="left")
 
         self.button_auftragserstellung = tk.Button(root, text="Auftragserstellung", command=self.oeffne_auftragserstellung)
-        self.button_auftragserstellung.pack()
+        self.button_auftragserstellung.pack(side="left")
 
     # Methode zum Öffnen der verschiedenen Fenster
     def oeffne_bestandsabfrage(self):
