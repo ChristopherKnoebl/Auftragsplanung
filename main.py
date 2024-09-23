@@ -1,7 +1,9 @@
 import tkinter as tk
 from tkinter import messagebox
+import pyodbc
 
-# Klasse Fertigungsaufträge (bleibt unverändert)
+# Klassen aus dem Model
+# Klasse Fertigungsaufträge 
 class Fertigungsauftraege:
     def __init__(self, auftragsnummer, produktname, menge, auftragsbeginn, auftragsende):
         self.auftragsnummer = auftragsnummer
@@ -20,7 +22,58 @@ class Fertigungsauftraege:
     def deckt_lagerbestand_materialbedarf(self):
         print("Prüfe, ob der Lagerbestand den Materialbedarf deckt...")
 
+# Klasse Lager
+class Lager():
+    SERVER = 'Chris-PC'
+    DATABASE = 'Beispiel-Firma'
+    USERNAME = '<username>'
+    PASSWORD = '<password>'
+
+    def __init__(self, name) -> None:
+        self.name = name
+
+    def lager_abfrage(self, ID=0):
+        connectionString = f"""
+        DRIVER={{ODBC Driver 18 for SQL Server}};
+        SERVER={Lager.SERVER};
+        DATABASE={Lager.DATABASE};
+        Trusted_Connection=yes;
+        TrustServerCertificate=yes;
+"""
+        try:
+            # Datenbankanbindung
+            conn = pyodbc.connect(connectionString)
+            cursor = conn.cursor()
+            
+            if ID == 0:
+                SQL = f"""
+                SELECT * FROM [Beispiel-Firma].[dbo].[{self.name}];
+                """
+                cursor.execute(SQL)
+            else:
+                SQL = f"""
+                SELECT * FROM [Beispiel-Firma].[dbo].[{self.name}]
+                WHERE ID = 1;
+                """
+                cursor.execute(SQL)
+
+            records = cursor.fetchall()
+            for r in records:
+                print(r)
+        except pyodbc.Error as e:
+            print(f"Fehler bei der Datenbankverbindung: {e}")
+        finally:
+            cursor.close()
+            conn.close()
+
+model1 = Lager("Materialien")
+print(model1.lager_abfrage())
+
 # Controller-Klasse
+class LagerController :
+    def __init__(self) -> None:
+        pass
+
 class AuftragsController:
     def __init__(self):
         self.auftraege = []  # Liste von Fertigungsaufträgen
@@ -47,6 +100,7 @@ class AuftragsController:
         print("Bestand wird disponiert...")
         return True
 
+# Klassen aus der GUI
 # Hauptfenster-Klasse wird zur Elternklasse
 class Hauptfenster:
     def __init__(self, root, controller):
