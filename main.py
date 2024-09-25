@@ -44,11 +44,12 @@ class Lager():
             # Datenbankanbindung
             conn = pyodbc.connect(connectionString)
             cursor = conn.cursor()
-            
+            print("Verbindung hergestellt")
             if ID == 0:
                 SQL = f"""
                 SELECT * FROM [Beispiel-Firma].[dbo].[{self.name}];
                 """
+                print(f"{ID=}")
                 cursor.execute(SQL)
             else:
                 SQL = f"""
@@ -57,15 +58,18 @@ class Lager():
                 """
                 cursor.execute(SQL)
 
+            ergebnisse = []
             records = cursor.fetchall()
             for r in records:
-                print(r)
+                ergebnisse.append(r)
+            print(ergebnisse)
+            
         except pyodbc.Error as e:
             print(f"Fehler bei der Datenbankverbindung: {e}")
         finally:
             cursor.close()
             conn.close()
-
+        return f"{ergebnisse=}"
 model1 = Lager("Materialien")
 print(model1.lager_abfrage())
 
@@ -142,15 +146,30 @@ class Bestandsabfrage(Hauptfenster):
         self.controller = controller
 
         # Widgets in Bestandsabfrage-Fenster
-        self.button_bestand_abfragen = tk.Button(self.window, text="Bestand abfragen", command=self.frage_bestand_ab)
-        self.button_bestand_abfragen.pack()
+        self.button_materialien_abfragen = tk.Button(self.window, text="Material-Bestand abfragen", command=self.frage_material_ab)
+        self.button_materialien_abfragen.pack()
+
+        self.button_produkte_abfragen = tk.Button(self.window, text="Produkt-Bestand abfragen", command=self.frage_produkt_ab)
+        self.button_produkte_abfragen.pack()
 
         self.button_fenster_schließen = tk.Button(self.window, text="Fenster schließen", command=self.schliesse_fenster)
         self.button_fenster_schließen.pack()
 
-    def frage_bestand_ab(self):
+    def frage_material_ab(self, ID=0):
+        lager = Lager("Materialien")
+       
         print("Bestand wird abgefragt...")
-        messagebox.showinfo("Bestandsabfrage", "Der Bestand wurde abgefragt.")
+        messagebox.showinfo("Bestandsabfrage", f"{lager.lager_abfrage(ID)}.")
+
+        return lager.lager_abfrage(ID)
+    
+    def frage_produkt_ab(self, ID=0):
+        lager = Lager("Produkte")
+       
+        print("Bestand wird abgefragt...")
+        messagebox.showinfo("Bestandsabfrage", f"{lager.lager_abfrage(ID)}.")
+
+        return lager.lager_abfrage(ID)
 
     # Methode zum Schließen des Fensters
     def schliesse_fenster(self):
