@@ -143,65 +143,84 @@ class Bestandsabfrage(Hauptfenster):
     def __init__(self, master, controller):
         self.window = tk.Toplevel(master)  # Neues Fenster
         self.window.title("Bestandsabfrage")
-        self.controller = controller
 
         # Widgets in Bestandsabfrage-Fenster
-        self.button_materialien_abfragen = tk.Button(self.window, text="Material-Bestand abfragen", command=self.frage_material_ab)
-        self.button_materialien_abfragen.pack()
+        self.label_anfrage = tk.Label(self.window, text="Welches Lager soll abgefragt werden?")
+        self.label_anfrage.grid(row=0, columnspan=2)
 
-        self.button_produkte_abfragen = tk.Button(self.window, text="Produkt-Bestand abfragen", command=self.frage_produkt_ab)
-        self.button_produkte_abfragen.pack()
+        self.button_materialien = tk.Button(self.window, text="Materiallager", command=lambda:self.setze_lager("Materialien"))
+        self.button_materialien.grid(row=1, column=0, padx=5, pady=5)
 
-        self.button_fenster_schließen = tk.Button(self.window, text="Fenster schließen", command=self.schliesse_fenster)
-        self.button_fenster_schließen.pack()
+        self.button_produkte = tk.Button(self.window, text="Produktlager", command=lambda:self.setze_lager("Produkte"))
+        self.button_produkte.grid(row=1, column=1, padx=5, pady=5)
 
-    def frage_material_ab(self, ID=0):
-        lager = Lager("Materialien")
-       
-        print("Bestand wird abgefragt...")
-        messagebox.showinfo("Bestandsabfrage", f"{lager.lager_abfrage(ID)}.")
+        self.label_eingabe = tk.Label(self.window, text="Kein Lager")
+        self.label_eingabe.grid(row=2, column=0, padx=5, pady=5)
 
-        return lager.lager_abfrage(ID)
+        self.entry_lager = tk.Entry(self.window)
+        self.entry_lager.grid(row=2, column=1, padx=5, pady=5)
+
+        self.button_abfragen = tk.Button(self.window, text="Abfragen", command= self.gib_rueck) 
+        self.button_abfragen.grid(row=2,column=2, padx=5, pady=5)
+
+        self.label_rueckgabe = tk.Label(self.window, text="Rückgabe")
+        self.label_rueckgabe.grid(row=2,column=3, padx=5, pady=5)
+    # Hilfsmethode zur Auswahl des Lagers
+    def setze_lager(self, lagername):
+        self.lagername = lagername
+        self.label_eingabe["text"] = f"ID eingeben: "
+        print(self.lagername)
     
-    def frage_produkt_ab(self, ID=0):
-        lager = Lager("Produkte")
-       
-        print("Bestand wird abgefragt...")
-        messagebox.showinfo("Bestandsabfrage", f"{lager.lager_abfrage(ID)}.")
-
-        return lager.lager_abfrage(ID)
-
-    # Methode zum Schließen des Fensters
-    def schliesse_fenster(self):
-        self.window.destroy()
+    def gib_rueck(self):
+        lagername = self.lagername, 
+        menge = int(self.entry_lager.get())
+        # ergebnis = controller.lager_abfragen(lagername, menge)    # methode muss noch im controller bearbeitet werden
+        self.label_rueckgabe["text"] = f"{lagername=}, {menge=}"
 
 class Bestandsdisposition(Hauptfenster):
     def __init__(self, master, controller):
         self.window = tk.Toplevel(master)  # Neues Fenster
         self.window.title("Bestandsdisposition")
-        self.controller = controller
 
         # Widgets in Bestandsdisposition-Fenster
-        self.button_bestand_disponieren = tk.Button(self.window, text="Bestand disponieren", command=self.disponiere_bestand)
-        self.button_bestand_disponieren.pack()
+        self.label_anfrage = tk.Label(self.window, text="Welches Material soll disponiert werden?")
+        self.label_anfrage.grid(row=0, columnspan=2, padx=5, pady=5)
 
-        self.button_bestand_abfragen = tk.Button(self.window, text="Bestand abfragen", command=self.frage_bestand_ab)
-        self.button_bestand_abfragen.pack()
+        self.label_material = tk.Label(self.window, text="Materialnummer")
+        self.label_material.grid(row=1, column=0, padx=5, pady=5)
 
-        self.button_fenster_schließen = tk.Button(self.window, text="Fenster schließen", command=self.schliesse_fenster)
-        self.button_fenster_schließen.pack()
+        self.entry_material = tk.Entry(self.window)
+        self.entry_material.grid(row=1, column=1, padx=5, pady=5)
 
-    def frage_bestand_ab(self):
-        print("Bestand wird abgefragt...")
-        messagebox.showinfo("Bestandsabfrage", "Der Bestand wurde abgefragt.")
+        self.label_menge = tk.Label(self.window, text="Menge")
+        self.label_menge.grid(row=2, column=0, padx=5, pady=5)
 
-    def disponiere_bestand(self):
-        print("Bestand wird disponiert...")
-        messagebox.showinfo("Bestandsdisposition", "Der Bestand wurde disponiert.")
+        self.entry_menge = tk.Entry(self.window)
+        self.entry_menge.grid(row=2, column=1, padx=5, pady=5)       
 
-    # Methode zum Schließen des Fensters
-    def schliesse_fenster(self):
-        self.window.destroy()
+        self.button_bestand_zubuchen = tk.Button(self.window, text="Bestand zubuchen", \
+        command=self.zubuchen_bestand)
+        self.button_bestand_zubuchen.grid(row=2,column=2, padx=5, pady=5)  
+
+        self.button_bestand_ausbuchen = tk.Button(self.window, text="Bestand ausbuchen", command=self.abbuchen_bestand)
+        self.button_bestand_ausbuchen.grid(row=3,column=2, padx=5, pady=5)  
+
+        self.label_rueck = tk.Label(self.window, text="Rückgabe")
+        self.label_rueck.grid(row=3,column=3, padx=5, pady=5)  
+
+    # Methoden zur Bestandsdisposition
+        
+    def zubuchen_bestand(self):
+        ID = int(self.entry_material.get())
+        menge = int(self.entry_menge.get())
+        self.label_rueck["text"] = f"{ID=}, {menge=}"
+        return ID, menge
+    
+    def abbuchen_bestand(self):
+        ID = int(self.entry_material.get())
+        menge = int(self.entry_menge.get()) * (-1)
+        self.label_rueck["text"] = f"{ID=}, {menge=}"
+        return ID, menge
 
 class Auftragsabfrage(Hauptfenster):
     def __init__(self, master, controller):
@@ -210,19 +229,23 @@ class Auftragsabfrage(Hauptfenster):
         self.controller = controller
 
         # Widgets in Auftragsabfrage-Fenster
-        self.button_auftrag_abfragen = tk.Button(self.window, text="Auftrag abfragen", command=self.frage_auftrag_ab)
-        self.button_auftrag_abfragen.pack()
+        self.label_fertigungsauftrag = tk.Label(self.window, text="Auftragsnummer")
+        self.label_fertigungsauftrag.grid(row=1, column=0, padx=5, pady=5)
 
-        self.button_fenster_schließen = tk.Button(self.window, text="Fenster schließen", command=self.schliesse_fenster)
-        self.button_fenster_schließen.pack()
+        self.entry_fertigungsauftrag = tk.Entry(self.window)
+        self.entry_fertigungsauftrag.grid(row=1, column=1, padx=5, pady=5)
 
+        self.button_auftrag_abfragen = tk.Button(self.window, text="Auftrag abfragen", command= self.frage_auftrag_ab)
+        self.button_auftrag_abfragen.grid(row=2, column=1, padx=5, pady=5)
+
+        self.label_rueck = tk.Label(self.window, text="Rückgabe")
+        self.label_rueck.grid(row=3,column=3, padx=5, pady=5)  
+
+    # Methode, um die Fertigungaufträge abzufragen
     def frage_auftrag_ab(self):
-        print("Auftrag wird abgefragt...")
-        messagebox.showinfo("Auftragsabfrage", "Der Auftrag wurde abgefragt.")
-
-    # Methode zum Schließen des Fensters
-    def schliesse_fenster(self):
-        self.window.destroy()
+        ID = int(self.entry_fertigungsauftrag.get())
+        self.label_rueck["text"] = f"{ID=}"
+        return ID
 
 class Auftragserstellung(Hauptfenster):
     def __init__(self, master, controller):
@@ -231,30 +254,43 @@ class Auftragserstellung(Hauptfenster):
         self.controller = controller  # Controller-Referenz
 
         # Widgets in Auftragserstellung-Fenster
+        self.label_material = tk.Label(self.window, text="Materialnummer")
+        self.label_material.grid(row=1, column=0, padx=5, pady=5)
+
+        self.entry_material = tk.Entry(self.window)
+        self.entry_material.grid(row=1, column=1, padx=5, pady=5)
+
+        self.label_menge = tk.Label(self.window, text="Auftragsmenge")
+        self.label_menge.grid(row=2, column=0, padx=5, pady=5)
+
+        self.entry_menge = tk.Entry(self.window)
+        self.entry_menge.grid(row=2, column=1, padx=5, pady=5)
+
+        self.label_beginn = tk.Label(self.window, text="Auftragsbeginn")
+        self.label_beginn.grid(row=3, column=0, padx=5, pady=5)
+
+        self.entry_beginn = tk.Entry(self.window)
+        self.entry_beginn.grid(row=3, column=1, padx=5, pady=5)
+
+        self.label_ende = tk.Label(self.window, text="Auftragsende")
+        self.label_ende.grid(row=4, column=0, padx=5, pady=5)
+
+        self.entry_ende = tk.Entry(self.window)
+        self.entry_ende.grid(row=4, column=1, padx=5, pady=5)
+
         self.button_auftrag_erstellen = tk.Button(self.window, text="Auftrag erstellen", command=self.erstelle_auftrag)
-        self.button_auftrag_erstellen.pack()
+        self.button_auftrag_erstellen.grid(row=5, column=0, padx=5, pady=5)
 
-        self.button_auftrag_abfragen = tk.Button(self.window, text="Auftrag abfragen", command=self.frage_auftrag_ab)
-        self.button_auftrag_abfragen.pack()
-
-        self.button_fenster_schließen = tk.Button(self.window, text="Fenster schließen", command=self.schliesse_fenster)
-        self.button_fenster_schließen.pack()
+        self.label_rueck = tk.Label(self.window, text="Rückgabe")
+        self.label_rueck.grid(row=6,column=0, padx=5, pady=5) 
 
     def erstelle_auftrag(self):
-        # Hier könnte der Nutzeraufgabeparameter über Eingabefelder erfasst werden
-        self.controller.erstelle_auftrag(123, "Produkt X", 10, "2023-09-01", "2023-09-05")
-        messagebox.showinfo("Auftragserstellung", "Ein Auftrag wurde erstellt.")
-
-    def frage_auftrag_ab(self):
-        auftrag = self.controller.frage_auftrag_ab(123)
-        if auftrag:
-            messagebox.showinfo("Auftragsabfrage", f"Auftrag gefunden: {auftrag.produktname}")
-        else:
-            messagebox.showinfo("Auftragsabfrage", "Auftrag nicht gefunden.")
-
-    # Methode zum Schließen des Fensters
-    def schliesse_fenster(self):
-        self.window.destroy()
+        matNr = int(self.entry_material.get())
+        menge = int(self.entry_menge.get())
+        start = self.entry_beginn.get()
+        ende = self.entry_ende.get()
+        self.label_rueck["text"] = f"{matNr=}, {menge=}, {start=}, {ende=}"
+        return matNr, menge, start, ende
 
 # Main-Loop
 if __name__ == "__main__":
@@ -262,4 +298,3 @@ if __name__ == "__main__":
     controller = AuftragsController()
     app = Hauptfenster(root, controller)
     root.mainloop()
-
