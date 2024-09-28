@@ -1,5 +1,6 @@
 import tkinter as tk
 from controller import Controller
+from model import Lager
 
 # Klassen aus der GUI
 # Hauptfenster-Klasse wird zur Elternklasse
@@ -88,10 +89,10 @@ class Bestandsabfrage(tk.Frame):
         print(self.lagername)
     
     def gib_rueck(self):
-        lagername = self.lagername, 
+        lagername = self.lagername 
         menge = int(self.entry_lager.get())
-        controller.lager_abfragen(lagername, menge)
-        self.label_rueckgabe["text"] = f"{lagername=}, {menge=}"
+        antwort = controller.lager_abfragen(lagername, menge)
+        self.label_rueckgabe["text"] = f"{antwort=}"
 
 class Bestandsdisposition(tk.Frame):
     def __init__(self, master, controller):
@@ -218,6 +219,7 @@ class Auftragserstellung(tk.Frame):
 
 # Main-Loop
 if __name__ == "__main__":
+    lager = Lager()
     controller = Controller()
     app = Hauptfenster(controller)
     app.mainloop()
