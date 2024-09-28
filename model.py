@@ -2,23 +2,8 @@ import pyodbc
 
 # Klasse Fertigungsaufträge 
 class Fertigungsauftraege:
-    def __init__(self, auftragsnummer, produktname, menge, auftragsbeginn, auftragsende):
-        self.auftragsnummer = auftragsnummer
-        self.produktname = produktname
-        self.menge = menge
-        self.auftragsbeginn = auftragsbeginn
-        self.auftragsende = auftragsende
-        self.timestamp = None
-
-    def kalkuliere_materialbedarf(self):
-        print("Materialbedarf wird kalkuliert...")
-
-    def erstelle_stueckliste(self):
-        print("Stückliste wird erstellt...")
-
-    def deckt_lagerbestand_materialbedarf(self):
-        print("Prüfe, ob der Lagerbestand den Materialbedarf deckt...")
-
+    # muss noch implementiert werden
+    pass
 # Klasse Lager
 class Lager():
     SERVER = 'Chris-PC'
@@ -26,10 +11,10 @@ class Lager():
     USERNAME = '<username>'
     PASSWORD = '<password>'
 
-    def __init__(self, name) -> None:
-        self.name = name
+    def __init__(self) -> None:
+        pass
 
-    def lager_abfrage(self, ID=0):
+    def lager_abfrage(self,lagername, ID=0):
         connectionString = f"""
         DRIVER={{ODBC Driver 18 for SQL Server}};
         SERVER={Lager.SERVER};
@@ -44,13 +29,12 @@ class Lager():
             print("Verbindung hergestellt")
             if ID == 0:
                 SQL = f"""
-                SELECT * FROM [Beispiel-Firma].[dbo].[{self.name}];
+                SELECT * FROM [Beispiel-Firma].[dbo].[{lagername}];
                 """
-                print(f"{ID=}")
                 cursor.execute(SQL)
             else:
                 SQL = f"""
-                SELECT * FROM [Beispiel-Firma].[dbo].[{self.name}]
+                SELECT * FROM [Beispiel-Firma].[dbo].[{lagername}]
                 WHERE ID = 1;
                 """
                 cursor.execute(SQL)
@@ -67,5 +51,5 @@ class Lager():
             cursor.close()
             conn.close()
         return f"{ergebnisse=}"
-model1 = Lager("Materialien")
-print(model1.lager_abfrage())
+# model1 = Lager()
+# print(model1.lager_abfrage("Materialien", 1))
