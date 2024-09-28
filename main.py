@@ -212,6 +212,7 @@ class Auftragserstellung(tk.Frame):
         menge = int(self.entry_menge.get())
         start = self.entry_beginn.get()
         ende = self.entry_ende.get()
+        controller.auftrag_erstellen(matNr, menge, start=None, ende=None)
         self.label_rueck["text"] = f"{matNr=}, {menge=}, {start=}, {ende=}"
         return matNr, menge, start, ende
 
