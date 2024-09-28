@@ -8,32 +8,27 @@ class Controller:
 
     # Methoden zur Lagerabfrage
     # Von der view erhalten
+    # müssen noch an das Modell übergeben werden
     def lager_abfragen(self,lagername, ID=0):
-        # lager = Lager(lagername)
-        # lager.lager_abfrage(ID)
-        return lagername, ID
+
+        messagebox.showinfo("Der Controller hat die Anfrage:", f"{lagername=}, {ID=} erhalten")
     # muss noch durchgeprüft werden, Anschluss an Datenbank notwendig
     # return muss noch an das modell weiter gegeben werden
 
     # Methoden zur Lagerdisposition
     def zubuchen_bestand(self, ID, menge):
-        pass
-    #     lager = Lager("Materialien")
-    #     ID = self.entry_material.get()
-    #     menge = int(self.entry_menge.get())
-    #     lager.material_erhöhen(ID, menge)
-    #     return ID, menge
-    
+        messagebox.showinfo("Der Controller hat die Anfrage:", f"{ID=}, {menge=} erhalten")
+
     def ausbuchen_bestand(self, ID, menge):
-        pass
-    #     lager = Lager("Materialien")
-    #     ID = self.entry_material.get()
-    #     menge = int(self.entry_menge.get())
-    #     lager.material_reduzieren(ID, menge)
-    #     return ID, menge
+        messagebox.showinfo("Der Controller hat die Anfrage:", f"{ID=}, {menge=} erhalten")
         
     
     # Methoden für die Auftragsplanung
     def auftrag_abfragen(self, ID):
         messagebox.showinfo("Der Controller hat die Anfrage:", f"{ID=} erhalten")
+
+    # Methode für die Auftragserstellung
+
+    def auftrag_erstellen(self, matNr, menge, start, ende):
+        messagebox.showinfo("Der Controller hat die Anfrage:", f"{matNr=}, {menge=}, {start=}, {ende=} erhalten")
         
