@@ -17,11 +17,13 @@ class Controller:
     # Methoden zur Lagerdisposition
     # muss noch an das Modell übergeben werden
     def zubuchen_bestand(self, ID, menge):
-        messagebox.showinfo("Der Controller hat die Anfrage:", f"{ID=}, {menge=} erhalten")
+        ergebnis = self.lager.zubuchen(ID, menge)
+        return ergebnis
 
         # muss noch an das Modell übergeben werden
     def ausbuchen_bestand(self, ID, menge):
-        messagebox.showinfo("Der Controller hat die Anfrage:", f"{ID=}, {menge=} erhalten")
+        ergebnis = self.lager.abbuchen(ID, menge)
+        return ergebnis
         
     # muss noch an das Modell übergeben werden
     # Methoden für die Auftragsplanung
