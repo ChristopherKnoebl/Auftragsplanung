@@ -23,6 +23,8 @@ Perspektivisch werden weitere Use Cases behandelt werden:
 ## Projektverlauf
 Das Grundgerüst für das Programm ist entworfen. Da mittelfristig ein anderes Framework für die GUI verwendet werden soll wird die Anwendung nach dem Model-View-Controller-Musters entworfen. In diesem Zusammenhang erscheint es günstig die Programmierung nach dem objektorientierten Paradigma zu gestalten.
 
+### Update
+Mittlerweile ist es möglich, den Bestand abzufragen. Als nächstes wird bei der Nutereingabe eine Fehlerbehandlung implementiert.
 ### Die View
 Eine überarbeitete Version der View ist erstellt. Hierbei werden die einzelnen Fenster als Klassen entworfen, welche mit tkinter grafisch dargestellt werden. Zu Testzecken wird die Nutzereingagbe im Feld "Rueck" dargestellt. Diese Behelfslösung wird entfernt, sobald Controller und Model entwickelt sind.
 ### Der Controller
