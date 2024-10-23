@@ -51,5 +51,32 @@ class Lager():
             cursor.close()
             conn.close()
         return f"{ergebnisse=}"
-# model1 = Lager()
-# print(model1.lager_abfrage("Materialien", 1))
+    
+    def zubuchen(self, ID, menge):
+        connectionString = f"""
+        DRIVER={{ODBC Driver 18 for SQL Server}};
+        SERVER={Lager.SERVER};
+        DATABASE={Lager.DATABASE};
+        Trusted_Connection=yes;
+        TrustServerCertificate=yes;
+        """
+        try:
+            conn = pyodbc.connect(connectionString)
+            cursor = conn.cursor()
+            print("Verbindung zum Lager hergestellt")
+
+            SQL = f"""
+            UPDATE [Beispiel-Firma].[dbo].[Materialien]
+            SET Menge = Menge + ?
+            WHERE ID = ?;
+            """
+            cursor.execute(SQL, (menge, ID))
+            conn.commit()
+            return f"Bestand für ID {ID} erfolgreich um {menge} erhöht"
+        except pyodbc.Error as e:
+            return f"Fehler bei der Datenbankverbindung: {e}"
+        finally:
+            cursor.close()
+            conn.close()
+    
+
